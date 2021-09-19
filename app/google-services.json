@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "244184751670",
+    "project_id": "voice-to-text-and-translate",
+    "storage_bucket": "voice-to-text-and-translate.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:244184751670:android:4c68c647e9dc28f27a4297",
+        "android_client_info": {
+          "package_name": "com.example.voicetotextandtranslate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "244184751670-nblrt024hpn2ho0ihbknla8jpe3e3h1c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbxkkxm5tIbzjOW2U56_4fXBFQo9h0EzY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "244184751670-nblrt024hpn2ho0ihbknla8jpe3e3h1c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-7148413509095909~8270730580"
+    }
+  ],
+  "configuration_version": "1"
+}
