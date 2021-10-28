@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Voice to text and translate</string>
+    <string name="app_name">Just Say</string>
+    <string name="source_text">Source Text</string>
+    <string name="or">OR</string>
+    <string name="say_something">Say Something</string>
+    <string name="translated_text">Translated Text</string>
 </resources>
