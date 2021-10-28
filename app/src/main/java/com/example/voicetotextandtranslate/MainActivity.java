@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     InterstitialAd mInterstitialAd;
     private Spinner fromSpinner,toSpinner;
     private TextInputEditText sourceEdt, translateTv;
-    private ImageView mic;
+    private ImageView mic, sourseTexeShare, translatedTexeShare;
     private MaterialButton translateBtn;
     String[] fromLanguages = {"English", "Bengali", "Hindi", "Urdu", "Afrikaans","Arabic","Belarusian","Bulgarian",
             "Catalan","Czech","Welsh"};
@@ -58,6 +58,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //        Share
+        sourseTexeShare = findViewById(R.id.sourseTexeShare);
+        translatedTexeShare = findViewById(R.id.translatedTexeShare);
+
 
         fromSpinner = findViewById(R.id.idFromSpinner);
         toSpinner = findViewById(R.id.idToSpinner);
@@ -91,6 +96,35 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        sourseTexeShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBody = sourceEdt.getText().toString();
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+
+            }
+        });
+
+        translatedTexeShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBody = translateTv.getText().toString();
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
 
             }
         });
@@ -297,6 +331,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return languageCode;
     }
+
 
 
 
