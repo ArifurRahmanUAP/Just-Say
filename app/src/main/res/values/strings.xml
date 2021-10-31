@@ -4,4 +4,8 @@
     <string name="or">OR</string>
     <string name="say_something">Say Something</string>
     <string name="translated_text">Translated Text</string>
+    <string name="translate">Translate</string>
+    <string name="share_button">Share Button</string>
+    <string name="clear_after_share">Clear After Share</string>
+    <string name="speak_here">Speak Here</string>
 </resources>

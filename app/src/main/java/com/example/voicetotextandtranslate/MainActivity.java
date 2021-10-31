@@ -3,26 +3,32 @@ package com.example.voicetotextandtranslate;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -36,46 +42,71 @@ import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslator;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslatorOptions;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     InterstitialAd mInterstitialAd;
-    private Spinner fromSpinner,toSpinner;
+    private CheckBox checkBoxId;
+    private Spinner fromSpinner, toSpinner, voiceLanguagespinner;
     private TextInputEditText sourceEdt, translateTv;
     private ImageView mic, sourseTexeShare, translatedTexeShare;
     private MaterialButton translateBtn;
-    String[] fromLanguages = {"English", "Bengali", "Hindi", "Urdu", "Afrikaans","Arabic","Belarusian","Bulgarian",
-            "Catalan","Czech","Welsh"};
+    String languageCode = "0";
+    private AdView mAdView;
 
-    String[] toLanguages = {"Bengali", "English", "Hindi","Urdu", "Afrikaans","Arabic","Belarusian","Bulgarian",
-            "Catalan","Czech","Welsh"};
 
-    private static final int REQUEST_PERMISSION_CODE = 1;
-    int languageCode,fromLanguageCode,toLanguageCode = 0;
+
+    String[] fromLanguages = {"English", "Bengali", "Hindi", "Urdu", "Afrikaans", "Arabic", "Belarusian", "Bulgarian",
+            "Catalan", "Czech", "Welsh"};
+
+    String[] toLanguages = {"Bengali", "English", "Hindi", "Urdu", "Afrikaans", "Arabic", "Belarusian", "Bulgarian",
+            "Catalan", "Czech", "Welsh"};
+
+    private static final int REQUEST_PERMISSION_CODE = 0;
+    int fromLanguageCode, toLanguageCode = 0;
+    String voiceLanguageCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
+        }
+
         //        Share
         sourseTexeShare = findViewById(R.id.sourseTexeShare);
         translatedTexeShare = findViewById(R.id.translatedTexeShare);
+                        //ADDVIEW
+
+        MobileAds.initialize(MainActivity.this);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView = findViewById(R.id.adView);
+        AdView adView = new AdView(this);
+        adView.setAdSize(AdSize.BANNER);
+        adView.setAdUnitId("ca-app-pub-7148413509095909/4203091086");
+        mAdView.loadAd(adRequest);
 
 
         fromSpinner = findViewById(R.id.idFromSpinner);
         toSpinner = findViewById(R.id.idToSpinner);
+//      voiceLanguagespinner = findViewById(R.id.voiceLanguage);
         sourceEdt = findViewById(R.id.idEdtsource);
         mic = findViewById(R.id.idMic);
+        checkBoxId = findViewById(R.id.checkBoxId);
 
         translateBtn = findViewById(R.id.idBtnTranslate);
         translateTv = findViewById(R.id.idEdttranslated);
 
+//        ArrayAdapter language = new ArrayAdapter(this, R.layout.spinner_item, voiceLanguage);
+//        language.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        voiceLanguagespinner.setAdapter(language);
+
         fromSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                fromLanguageCode = getLanguageCode(fromLanguages[position]);
+                fromLanguageCode = getLanguageCode(fromLanguages[position], true);
             }
 
             @Override
@@ -84,14 +115,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ArrayAdapter fromAdapter = new ArrayAdapter(this,R.layout.spinner_item,fromLanguages);
+        ArrayAdapter fromAdapter = new ArrayAdapter(this, R.layout.spinner_item, fromLanguages);
         fromAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         fromSpinner.setAdapter(fromAdapter);
 
         toSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                toLanguageCode = getLanguageCode(toLanguages[position]);
+                toLanguageCode = getLanguageCode(toLanguages[position], false);
             }
 
             @Override
@@ -104,13 +135,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-
                 Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
                 String shareBody = sourceEdt.getText().toString();
                 sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
                 sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
+
+
+                if (checkBoxId.isChecked()) {
+                    sourceEdt.setText("");
+                }
 
             }
         });
@@ -126,10 +161,14 @@ public class MainActivity extends AppCompatActivity {
                 sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
 
+                if (checkBoxId.isChecked()) {
+                    translateTv.setText("");
+                }
+
             }
         });
 
-        ArrayAdapter toAdapter = new ArrayAdapter(this,R.layout.spinner_item,toLanguages);
+        ArrayAdapter toAdapter = new ArrayAdapter(this, R.layout.spinner_item, toLanguages);
         toAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         toSpinner.setAdapter(toAdapter);
 
@@ -144,28 +183,25 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 translateTv.setText("");
-                if (sourceEdt.getText().toString().isEmpty())
-                {
-                    Toast.makeText(MainActivity.this,"Please enter text to translate",Toast.LENGTH_LONG).show();
-                }
-                else if (fromLanguageCode==0)
-                {
-                    Toast.makeText(MainActivity.this,"Please Select source language",Toast.LENGTH_LONG).show();
-                }
-                else if (toLanguageCode==0)
-                {
-                    Toast.makeText(MainActivity.this,"Please Select the language to make translation",Toast.LENGTH_LONG).show();
-                }
-                else
-                {
-                    translateText(fromLanguageCode,toLanguageCode,sourceEdt.getText().toString());
+                if (sourceEdt.getText().toString().isEmpty()) {
+
+                    Toast.makeText(MainActivity.this, "Please enter text to translate", Toast.LENGTH_LONG).show();
+                } else if (fromLanguageCode == 0) {
+                    Toast.makeText(MainActivity.this, "Please Select source language", Toast.LENGTH_LONG).show();
+                } else if (toLanguageCode == 0) {
+                    Toast.makeText(MainActivity.this, "Please Select the language to make translation", Toast.LENGTH_LONG).show();
+                } else {
+                    translateText(fromLanguageCode, toLanguageCode, sourceEdt.getText().toString());
                 }
 
             }
         });
+
+
         mic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
 
                 if (mInterstitialAd != null) {
                     mInterstitialAd.show(MainActivity.this);
@@ -173,26 +209,22 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("TAG", "The interstitial ad wasn't ready yet.");
                 }
 
-                Intent i =new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-                i.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-                i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2500);
-                i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 2500);
-                i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 15000);
-                i.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
-                i.putExtra(RecognizerIntent.EXTRA_PROMPT,"Speak to convert text");
-                try{
-                    startActivityForResult(i,REQUEST_PERMISSION_CODE);
-                }
-                catch (Exception e)
-                {
+                Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                i.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
+                i.putExtra(RecognizerIntent.EXTRA_LANGUAGE, voiceLanguageCode);
+                i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 5000);
+                i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 5000);
+
+                try {
+                    startActivityForResult(i, REQUEST_PERMISSION_CODE);
+                } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(MainActivity.this,""+e.getMessage(),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        AdRequest adRequest = new AdRequest.Builder().build();
 
         translateTv.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -204,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        InterstitialAd.load(this,"ca-app-pub-7148413509095909/1850762081", adRequest,
+        InterstitialAd.load(this, "ca-app-pub-7148413509095909/1850762081", adRequest,
                 new InterstitialAdLoadCallback() {
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
@@ -222,30 +254,25 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void copytoClip(String text)
-    {
+    private void copytoClip(String text) {
         ClipboardManager clipBoard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("Copied Data",text);
+        ClipData clip = ClipData.newPlainText("Copied Data", text);
         clipBoard.setPrimaryClip(clip);
 
-        Toast.makeText(MainActivity.this,"Copied",Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, "Copied", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_PERMISSION_CODE)
-        {
-            if(resultCode == RESULT_OK && data!=null)
-            {
-                ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                sourceEdt.setText(result.get(0));
-            }
+        if (requestCode == REQUEST_PERMISSION_CODE && resultCode == RESULT_OK && data != null) {
+            ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            sourceEdt.setText(result.get(0));
+
         }
     }
 
-    private void translateText(int fromLanguageCode, int toLanguageCode, String source)
-    {
+    private void translateText(int fromLanguageCode, int toLanguageCode, String source) {
         translateTv.setText("Translating..");
         FirebaseTranslatorOptions options = new FirebaseTranslatorOptions.Builder()
                 .setSourceLanguage(fromLanguageCode)
@@ -266,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(MainActivity.this,"Fail to translate:"+e.getMessage(),Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Fail to translate:" + e.getMessage(), Toast.LENGTH_LONG).show();
 
                     }
 
@@ -275,64 +302,73 @@ public class MainActivity extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(MainActivity.this,"Fail to download Language"+ e.getMessage(),Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Fail to download Language" + e.getMessage(), Toast.LENGTH_LONG).show();
 
             }
         });
 
     }
 
-    private int getLanguageCode(String language) {
-        int languageCode = 0;
+
+    private int getLanguageCode(String language, boolean isFromSpinner) {
+
+        int selectedLanguage = FirebaseTranslateLanguage.EN;
         switch (language) {
             case "English":
-                languageCode = FirebaseTranslateLanguage.EN;
+                languageCode = "en";
+                selectedLanguage = FirebaseTranslateLanguage.EN;
                 break;
 
             case "Bengali":
-                languageCode = FirebaseTranslateLanguage.BN;
+                languageCode = "bn";
+                selectedLanguage = FirebaseTranslateLanguage.BN;
                 break;
 
             case "Hindi":
-                languageCode = FirebaseTranslateLanguage.HI;
+
+            case "Belarusian":
+                languageCode = "hi";
+                selectedLanguage = FirebaseTranslateLanguage.HI;
                 break;
 
             case "Urdu":
-                languageCode = FirebaseTranslateLanguage.UR;
+                languageCode = "ur";
+                selectedLanguage = FirebaseTranslateLanguage.UR;
                 break;
 
             case "Afrikaans":
-                languageCode = FirebaseTranslateLanguage.AF;
+                languageCode = "af";
+                selectedLanguage = FirebaseTranslateLanguage.AF;
                 break;
 
             case "Arabic":
-                languageCode = FirebaseTranslateLanguage.AR;
-                break;
-
-            case "Belarusian":
-                languageCode = FirebaseTranslateLanguage.EN;
+                languageCode = "ar";
+                selectedLanguage = FirebaseTranslateLanguage.AR;
                 break;
 
             case "Bulgarian":
-                languageCode = FirebaseTranslateLanguage.BE;
+                languageCode = "be";
+                selectedLanguage = FirebaseTranslateLanguage.BE;
                 break;
 
             case "Catalan":
-                languageCode = FirebaseTranslateLanguage.CA;
+                languageCode = "ca";
+                selectedLanguage = FirebaseTranslateLanguage.CA;
                 break;
 
             case "Czech":
-                languageCode = FirebaseTranslateLanguage.CS;
+                languageCode = "cs";
+                selectedLanguage = FirebaseTranslateLanguage.CS;
                 break;
 
             case "Welsh":
-                languageCode = FirebaseTranslateLanguage.CY;
+                languageCode = "cy";
+                selectedLanguage = FirebaseTranslateLanguage.CY;
                 break;
         }
-        return languageCode;
+        if (isFromSpinner)
+            voiceLanguageCode = languageCode;
+        return selectedLanguage;
     }
-
-
-
 
 }
