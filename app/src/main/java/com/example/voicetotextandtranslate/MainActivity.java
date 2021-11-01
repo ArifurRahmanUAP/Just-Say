@@ -11,11 +11,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -42,6 +44,7 @@ import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslator;
 import com.google.firebase.ml.naturallanguage.translate.FirebaseTranslatorOptions;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,18 +52,18 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox checkBoxId;
     private Spinner fromSpinner, toSpinner, voiceLanguagespinner;
     private TextInputEditText sourceEdt, translateTv;
-    private ImageView mic, sourseTexeShare, translatedTexeShare;
+    private ImageView mic, sourseTexeShare, translatedTexeShare, fromSpeech,  toSpeech;
+    TextToSpeech tts;
     private MaterialButton translateBtn;
     String languageCode = "0";
     private AdView mAdView;
 
 
+    String[] fromLanguages = {"English", "Bengali", "Hindi", "Urdu", "Philippine", "Afrikaans", "Arabic", "Korean", "Japanese",
+            "Catalan", "Spanish", "Swedish"};
 
-    String[] fromLanguages = {"English", "Bengali", "Hindi", "Urdu", "Afrikaans", "Arabic", "Belarusian", "Bulgarian",
-            "Catalan", "Czech", "Welsh"};
-
-    String[] toLanguages = {"Bengali", "English", "Hindi", "Urdu", "Afrikaans", "Arabic", "Belarusian", "Bulgarian",
-            "Catalan", "Czech", "Welsh"};
+    String[] toLanguages = {"Bengali", "English", "Hindi", "Urdu", "Afrikaans", "Arabic", "Korean", "Japanese",
+            "Catalan", "Spanish", "Swedish"};
 
     private static final int REQUEST_PERMISSION_CODE = 0;
     int fromLanguageCode, toLanguageCode = 0;
@@ -78,30 +81,24 @@ public class MainActivity extends AppCompatActivity {
         //        Share
         sourseTexeShare = findViewById(R.id.sourseTexeShare);
         translatedTexeShare = findViewById(R.id.translatedTexeShare);
-                        //ADDVIEW
+        //ADDVIEW
 
         MobileAds.initialize(MainActivity.this);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView = findViewById(R.id.adView);
         AdView adView = new AdView(this);
         adView.setAdSize(AdSize.BANNER);
-        adView.setAdUnitId("ca-app-pub-7148413509095909/4203091086");
+        adView.setAdUnitId("ca-app-pub-4459566286777302/7966254460");
         mAdView.loadAd(adRequest);
-
 
         fromSpinner = findViewById(R.id.idFromSpinner);
         toSpinner = findViewById(R.id.idToSpinner);
-//      voiceLanguagespinner = findViewById(R.id.voiceLanguage);
         sourceEdt = findViewById(R.id.idEdtsource);
         mic = findViewById(R.id.idMic);
         checkBoxId = findViewById(R.id.checkBoxId);
 
         translateBtn = findViewById(R.id.idBtnTranslate);
         translateTv = findViewById(R.id.idEdttranslated);
-
-//        ArrayAdapter language = new ArrayAdapter(this, R.layout.spinner_item, voiceLanguage);
-//        language.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        voiceLanguagespinner.setAdapter(language);
 
         fromSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -164,7 +161,6 @@ public class MainActivity extends AppCompatActivity {
                 if (checkBoxId.isChecked()) {
                     translateTv.setText("");
                 }
-
             }
         });
 
@@ -193,7 +189,6 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     translateText(fromLanguageCode, toLanguageCode, sourceEdt.getText().toString());
                 }
-
             }
         });
 
@@ -225,18 +220,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         translateTv.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-
                 String shareBody = translateTv.getText().toString();
                 copytoClip(shareBody);
                 return true;
             }
         });
 
-        InterstitialAd.load(this, "ca-app-pub-7148413509095909/1850762081", adRequest,
+        InterstitialAd.load(this, "ca-app-pub-4459566286777302/2399533752", adRequest,
                 new InterstitialAdLoadCallback() {
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
@@ -251,7 +244,6 @@ public class MainActivity extends AppCompatActivity {
                         mInterstitialAd = null;
                     }
                 });
-
     }
 
     private void copytoClip(String text) {
@@ -268,7 +260,6 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_PERMISSION_CODE && resultCode == RESULT_OK && data != null) {
             ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             sourceEdt.setText(result.get(0));
-
         }
     }
 
@@ -294,21 +285,16 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Toast.makeText(MainActivity.this, "Fail to translate:" + e.getMessage(), Toast.LENGTH_LONG).show();
-
                     }
-
                 });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Toast.makeText(MainActivity.this, "Fail to download Language" + e.getMessage(), Toast.LENGTH_LONG).show();
-
             }
         });
-
     }
-
 
     private int getLanguageCode(String language, boolean isFromSpinner) {
 
@@ -325,10 +311,13 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case "Hindi":
-
-            case "Belarusian":
                 languageCode = "hi";
                 selectedLanguage = FirebaseTranslateLanguage.HI;
+                break;
+
+            case "Belarusian":
+                languageCode = "be";
+                selectedLanguage = FirebaseTranslateLanguage.BE;
                 break;
 
             case "Urdu":
@@ -346,9 +335,9 @@ public class MainActivity extends AppCompatActivity {
                 selectedLanguage = FirebaseTranslateLanguage.AR;
                 break;
 
-            case "Bulgarian":
-                languageCode = "be";
-                selectedLanguage = FirebaseTranslateLanguage.BE;
+            case "Korean":
+                languageCode = "ko";
+                selectedLanguage = FirebaseTranslateLanguage.KO;
                 break;
 
             case "Catalan":
@@ -356,19 +345,30 @@ public class MainActivity extends AppCompatActivity {
                 selectedLanguage = FirebaseTranslateLanguage.CA;
                 break;
 
-            case "Czech":
-                languageCode = "cs";
-                selectedLanguage = FirebaseTranslateLanguage.CS;
+            case "Spanish":
+                languageCode = "es";
+                selectedLanguage = FirebaseTranslateLanguage.ES;
                 break;
 
-            case "Welsh":
-                languageCode = "cy";
-                selectedLanguage = FirebaseTranslateLanguage.CY;
+            case "Japanese":
+                languageCode = "ja";
+                selectedLanguage = FirebaseTranslateLanguage.JA;
+                break;
+
+            case "Swedish":
+                languageCode = "sv";
+                selectedLanguage = FirebaseTranslateLanguage.SV;
+                break;
+
+            case "Philippine":
+                languageCode = "fil";
+                selectedLanguage = FirebaseTranslateLanguage.PL;
                 break;
         }
         if (isFromSpinner)
             voiceLanguageCode = languageCode;
         return selectedLanguage;
     }
+
 
 }

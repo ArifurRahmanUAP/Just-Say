@@ -6,19 +6,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:gravity="center"
+    android:orientation="vertical"
     android:background="@color/black_shade_1"
     style="@style/AppTheme.MaterialTheme"
-    android:orientation="vertical">
+    tools:context=".MainActivity">
 
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
         android:orientation="horizontal"
         android:layout_marginTop="5dp"
-        android:weightSum="15">
+        android:weightSum="20">
+
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -26,12 +35,13 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="20dp"
-            android:layout_weight="14"
+            android:layout_weight="18"
             android:hint="@string/source_text"
             android:orientation="horizontal"
             android:padding="5dp"
             android:textColorHint="@color/white"
             app:hintTextColor="@color/white">
+
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/idEdtsource"
@@ -43,13 +53,14 @@
                 android:textColor="@color/white"
                 android:textColorHint="@color/white"
                 android:textSize="14sp" />
+
         </com.google.android.material.textfield.TextInputLayout>
 
         <ImageView
             android:id="@+id/sourseTexeShare"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:contentDescription="@string/share_button"
             android:src="@drawable/share"
             app:tint="@color/yellow"
@@ -104,7 +115,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="10dp"
         android:text="@string/translate"
         android:textAllCaps="false"
         android:textColor="#212121"
@@ -112,9 +123,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
         android:orientation="horizontal"
-        android:weightSum="15">
+        android:weightSum="20">
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -127,7 +138,7 @@
             android:padding="5dp"
             android:textColorHint="@color/white"
             app:hintTextColor="@color/white"
-            android:layout_weight="14">
+            android:layout_weight="18">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/idEdttranslated"
@@ -143,11 +154,12 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+
         <ImageView
             android:id="@+id/translatedTexeShare"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:contentDescription="@string/share_button"
             android:src="@drawable/share"
             app:tint="@color/yellow"
@@ -214,7 +226,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        ads:adUnitId="ca-app-pub-4459566286777302/7966254460"
         tools:ignore="NotSibling" />
+
+
+    </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout >
