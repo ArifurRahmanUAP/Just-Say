@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.voicetotextandtranslate">
+    package="com.justit.voicetotext">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
@@ -18,7 +18,7 @@
             android:value="ca-app-pub-4459566286777302~6354963351"/>
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.justit.voicetotext.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

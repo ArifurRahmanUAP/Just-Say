@@ -1,4 +1,4 @@
-package com.example.voicetotextandtranslate;
+package com.justit.voicetotext;
 
 import org.junit.Test;
 
