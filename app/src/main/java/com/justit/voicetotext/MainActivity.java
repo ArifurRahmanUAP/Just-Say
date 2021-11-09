@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox checkBoxId;
     private Spinner fromSpinner, toSpinner, voiceLanguagespinner;
     private TextInputEditText sourceEdt, translateTv;
-    private ImageView mic, sourseTexeShare, translatedTexeShare, fromSpeech,  toSpeech;
+    private ImageView mic, sourseTexeShare, translatedTexeShare, fromSpeech,  toSpeech, appShare;
     TextToSpeech tts;
     private MaterialButton translateBtn;
     String languageCode = "0";
@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         sourceEdt = findViewById(R.id.idEdtsource);
         mic = findViewById(R.id.idMic);
         checkBoxId = findViewById(R.id.checkBoxId);
+//        appShare = findViewById(R.id.appShare);
 
         translateBtn = findViewById(R.id.idBtnTranslate);
         translateTv = findViewById(R.id.idEdttranslated);
@@ -112,6 +113,18 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+//        appShare.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent sendIntent = new Intent();
+//                sendIntent.setAction(Intent.ACTION_SEND);
+//                sendIntent.putExtra(Intent.EXTRA_TEXT, "Check out the App at: https://play.google.com/store/apps/details?id=com.justit.voicetotext");
+//                sendIntent.setType("text/plain");
+//                getApplicationContext().startActivity(sendIntent);
+//                Toast.makeText(getApplicationContext(), "Share", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         ArrayAdapter fromAdapter = new ArrayAdapter(this, R.layout.spinner_item, fromLanguages);
         fromAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
@@ -198,19 +211,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-
-                if (mInterstitialAd != null) {
-                    mInterstitialAd.show(MainActivity.this);
-                } else {
-                    Log.d("TAG", "The interstitial ad wasn't ready yet.");
-                }
-
                 Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                 i.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
                 i.putExtra(RecognizerIntent.EXTRA_LANGUAGE, voiceLanguageCode);
                 i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-                i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 5000);
-                i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 5000);
+                i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 9000);
+                i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 9000);
 
                 try {
                     startActivityForResult(i, REQUEST_PERMISSION_CODE);

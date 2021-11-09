@@ -10,15 +10,18 @@
     android:background="@color/black_shade_1"
     android:orientation="vertical"
     tools:context="com.justit.voicetotext.MainActivity">
-
+<!--<include layout="@layout/toolbar"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_width="wrap_content" />-->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:layout_marginTop="20dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -58,7 +61,7 @@
 
                 <ImageView
                     android:id="@+id/sourseTexeShare"
-                    android:layout_width="0dp"
+                    android:layout_width="11dp"
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:contentDescription="@string/share_button"
@@ -69,7 +72,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="20dp"
@@ -79,17 +82,17 @@
                 <Spinner
                     android:id="@+id/idFromSpinner"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
                     android:layout_margin="3dp"
                     android:layout_weight="1"
-                    android:gravity="center"
                     android:outlineSpotShadowColor="@color/yellow"
                     android:padding="3dp"
                     tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
                 <ImageView
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:src="@drawable/right"
@@ -98,10 +101,10 @@
                 <Spinner
                     android:id="@+id/idToSpinner"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
                     android:layout_margin="3dp"
                     android:layout_weight="1"
-                    android:gravity="center"
                     android:padding="3dp"
                     tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
@@ -111,7 +114,7 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/idBtnTranslate"
                 android:layout_width="350dp"
-                android:layout_height="wrap_content"
+                android:layout_height="55dp"
                 android:layout_gravity="center"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
@@ -119,7 +122,7 @@
                 android:layout_marginBottom="10dp"
                 android:text="@string/translate"
                 android:textAllCaps="false"
-                android:textColor="#212121"
+                android:textColor="#FFFFFF"
                 tools:ignore="TextContrastCheck,TextContrastCheck" />
 
             <LinearLayout
@@ -158,7 +161,7 @@
 
                 <ImageView
                     android:id="@+id/translatedTexeShare"
-                    android:layout_width="0dp"
+                    android:layout_width="11dp"
                     android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:contentDescription="@string/share_button"
@@ -218,18 +221,18 @@
                     android:layout_height="wrap_content"
                     android:buttonTint="#A66F6F" />
             </LinearLayout>
-
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/adView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                ads:adSize="BANNER"
+                ads:adUnitId="ca-app-pub-4459566286777302/7966254460" />
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-4459566286777302/7966254460" />
+
 
 
 </RelativeLayout>
