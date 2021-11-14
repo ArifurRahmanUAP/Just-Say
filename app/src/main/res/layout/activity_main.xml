@@ -113,9 +113,9 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/idBtnTranslate"
-                android:layout_width="350dp"
+                android:layout_width="320dp"
                 android:layout_height="55dp"
-                android:layout_gravity="center"
+                android:gravity="center"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="20dp"

@@ -1,6 +1,7 @@
 package com.justit.voicetotext;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
@@ -78,6 +79,13 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
         }
 
+        this.getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setCustomView(R.layout.toolbar);
+        getSupportActionBar().setElevation(0);
+        View view = getSupportActionBar().getCustomView();
+        appShare = view.findViewById(R.id.appShare);
+
         //        Share
         sourseTexeShare = findViewById(R.id.sourseTexeShare);
         translatedTexeShare = findViewById(R.id.translatedTexeShare);
@@ -102,6 +110,26 @@ public class MainActivity extends AppCompatActivity {
         translateBtn = findViewById(R.id.idBtnTranslate);
         translateTv = findViewById(R.id.idEdttranslated);
 
+
+        appShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Just Say");
+                    String shareMessage= "I am using this application for voice to text conversion, also for translation to other languages. " +
+                            "My fascination is that I can share the texts in social media and to messaging app like Whatsapp, Messenger, Imo etc." +
+                            " It would be helpful for you.\n";
+                    shareMessage = shareMessage + "https://play.google.com/store/apps/details?id=com.justit.voicetotext";
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+                    startActivity(Intent.createChooser(shareIntent, "choose one"));
+                } catch(Exception e) {
+                    //e.toString();
+                }
+            }
+        });
+
         fromSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -114,17 +142,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        appShare.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent sendIntent = new Intent();
-//                sendIntent.setAction(Intent.ACTION_SEND);
-//                sendIntent.putExtra(Intent.EXTRA_TEXT, "Check out the App at: https://play.google.com/store/apps/details?id=com.justit.voicetotext");
-//                sendIntent.setType("text/plain");
-//                getApplicationContext().startActivity(sendIntent);
-//                Toast.makeText(getApplicationContext(), "Share", Toast.LENGTH_SHORT).show();
-//            }
-//        });
 
         ArrayAdapter fromAdapter = new ArrayAdapter(this, R.layout.spinner_item, fromLanguages);
         fromAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
@@ -217,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
                 i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
                 i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 9000);
                 i.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 9000);
-
+                Database database = new Database(getApplicationContext());
                 try {
                     startActivityForResult(i, REQUEST_PERMISSION_CODE);
                 } catch (Exception e) {
